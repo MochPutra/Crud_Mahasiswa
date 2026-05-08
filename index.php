@@ -9,6 +9,13 @@ $total_data = mysqli_fetch_assoc($count_query)['total'];
 // Count unique jurusan
 $jurusan_query = mysqli_query($conn, "SELECT COUNT(DISTINCT jurusan) as total FROM mahasiswa");
 $total_jurusan = mysqli_fetch_assoc($jurusan_query)['total'];
+
+// Get distinct jurusan list for filter
+$jurusan_list_query = mysqli_query($conn, "SELECT DISTINCT jurusan FROM mahasiswa ORDER BY jurusan ASC");
+$jurusan_list = [];
+while ($j = mysqli_fetch_assoc($jurusan_list_query)) {
+    $jurusan_list[] = $j['jurusan'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -82,11 +89,40 @@ $total_jurusan = mysqli_fetch_assoc($jurusan_query)['total'];
         <div class="toolbar">
             <div class="search-box">
                 <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" placeholder="Cari mahasiswa..." onkeyup="searchTable()">
+                <input type="text" id="searchInput" placeholder="Cari mahasiswa..." onkeyup="applyFilters()">
             </div>
             <a href="form.php" class="btn btn-primary" id="btn-tambah-data">
                 <span>＋</span> Tambah Data
             </a>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label class="filter-label">Urutkan</label>
+                <div class="filter-controls">
+                    <button class="filter-chip" id="sortNim" onclick="toggleSort('nim')" title="Urutkan berdasarkan NIM">
+                        <span class="filter-chip-icon">🔢</span> NIM <span class="sort-arrow" id="sortNimArrow"></span>
+                    </button>
+                    <button class="filter-chip" id="sortNama" onclick="toggleSort('nama')" title="Urutkan berdasarkan Nama">
+                        <span class="filter-chip-icon">🔤</span> Nama <span class="sort-arrow" id="sortNamaArrow"></span>
+                    </button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Jurusan</label>
+                <div class="filter-controls">
+                    <select class="filter-select" id="filterJurusan" onchange="applyFilters()">
+                        <option value="">Semua Jurusan</option>
+                        <?php foreach ($jurusan_list as $jrs): ?>
+                            <option value="<?= htmlspecialchars($jrs); ?>"><?= htmlspecialchars($jrs); ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+            </div>
+            <button class="filter-reset" id="resetFilters" onclick="resetFilters()" title="Reset semua filter">
+                ✕ Reset
+            </button>
         </div>
 
         <!-- Table -->

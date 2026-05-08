@@ -187,28 +187,150 @@ document.addEventListener('DOMContentLoaded', function() {
     // (initialized on DOMContentLoaded)
 });
 
-// ========== Search Table ==========
-function searchTable() {
-    const input = document.getElementById('searchInput');
-    if (!input) return;
-    
-    const filter = input.value.toLowerCase();
+// ========== Filter & Sort State ==========
+let currentSort = { field: null, direction: null }; // field: 'nim'|'nama', direction: 'asc'|'desc'|null
+
+// Column indices in the table
+const COL_NO = 0;
+const COL_FOTO = 1;
+const COL_NIM = 2;
+const COL_NAMA = 3;
+const COL_JURUSAN = 4;
+const COL_AKSI = 5;
+
+// ========== Toggle Sort ==========
+function toggleSort(field) {
+    if (currentSort.field === field) {
+        // Cycle: asc -> desc -> none
+        if (currentSort.direction === 'asc') {
+            currentSort.direction = 'desc';
+        } else if (currentSort.direction === 'desc') {
+            currentSort.field = null;
+            currentSort.direction = null;
+        }
+    } else {
+        currentSort.field = field;
+        currentSort.direction = 'asc';
+    }
+    updateSortUI();
+    applyFilters();
+}
+
+// ========== Update Sort Button UI ==========
+function updateSortUI() {
+    const nimArrow = document.getElementById('sortNimArrow');
+    const namaArrow = document.getElementById('sortNamaArrow');
+    const nimBtn = document.getElementById('sortNim');
+    const namaBtn = document.getElementById('sortNama');
+
+    // Reset all
+    if (nimArrow) nimArrow.textContent = '';
+    if (namaArrow) namaArrow.textContent = '';
+    if (nimBtn) nimBtn.classList.remove('active');
+    if (namaBtn) namaBtn.classList.remove('active');
+
+    // Set active
+    if (currentSort.field === 'nim' && currentSort.direction) {
+        if (nimArrow) nimArrow.textContent = currentSort.direction === 'asc' ? '↑' : '↓';
+        if (nimBtn) nimBtn.classList.add('active');
+    } else if (currentSort.field === 'nama' && currentSort.direction) {
+        if (namaArrow) namaArrow.textContent = currentSort.direction === 'asc' ? '↑' : '↓';
+        if (namaBtn) namaBtn.classList.add('active');
+    }
+}
+
+// ========== Apply All Filters ==========
+function applyFilters() {
     const table = document.getElementById('dataTable');
     if (!table) return;
-    
-    const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
-    
-    for (let i = 0; i < rows.length; i++) {
-        const cells = rows[i].getElementsByTagName('td');
-        let match = false;
-        
-        for (let j = 0; j < cells.length; j++) {
-            if (cells[j].textContent.toLowerCase().includes(filter)) {
-                match = true;
-                break;
+
+    const tbody = table.getElementsByTagName('tbody')[0];
+    const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+    // Skip if only empty-state row
+    if (rows.length === 1 && rows[0].querySelector('.empty-state')) return;
+
+    // Get filter values
+    const searchInput = document.getElementById('searchInput');
+    const jurusanSelect = document.getElementById('filterJurusan');
+    const searchText = searchInput ? searchInput.value.toLowerCase() : '';
+    const jurusanFilter = jurusanSelect ? jurusanSelect.value : '';
+
+    // 1. Sort rows if needed
+    if (currentSort.field && currentSort.direction) {
+        const colIndex = currentSort.field === 'nim' ? COL_NIM : COL_NAMA;
+        rows.sort((a, b) => {
+            const aText = a.getElementsByTagName('td')[colIndex]?.textContent.trim().toLowerCase() || '';
+            const bText = b.getElementsByTagName('td')[colIndex]?.textContent.trim().toLowerCase() || '';
+            
+            let comparison;
+            if (currentSort.field === 'nim') {
+                // Try numeric comparison for NIM
+                const aNum = parseInt(aText, 10);
+                const bNum = parseInt(bText, 10);
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    comparison = aNum - bNum;
+                } else {
+                    comparison = aText.localeCompare(bText);
+                }
+            } else {
+                comparison = aText.localeCompare(bText, 'id');
+            }
+            
+            return currentSort.direction === 'desc' ? -comparison : comparison;
+        });
+
+        // Re-append sorted rows
+        rows.forEach(row => tbody.appendChild(row));
+    }
+
+    // 2. Apply search + jurusan filter (visibility)
+    let visibleNo = 1;
+    rows.forEach(row => {
+        const cells = row.getElementsByTagName('td');
+        if (cells.length === 0) return;
+
+        // Jurusan filter
+        const rowJurusan = cells[COL_JURUSAN]?.textContent.trim() || '';
+        const matchJurusan = !jurusanFilter || rowJurusan === jurusanFilter;
+
+        // Search filter (search across NIM, Nama, Jurusan)
+        let matchSearch = true;
+        if (searchText) {
+            matchSearch = false;
+            for (let j = 0; j < cells.length; j++) {
+                if (cells[j].textContent.toLowerCase().includes(searchText)) {
+                    matchSearch = true;
+                    break;
+                }
             }
         }
-        
-        rows[i].style.display = match ? '' : 'none';
-    }
+
+        const isVisible = matchJurusan && matchSearch;
+        row.style.display = isVisible ? '' : 'none';
+
+        // Re-number visible rows
+        if (isVisible && cells[COL_NO]) {
+            cells[COL_NO].textContent = visibleNo++;
+        }
+    });
+}
+
+// ========== Reset All Filters ==========
+function resetFilters() {
+    // Reset search
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) searchInput.value = '';
+
+    // Reset jurusan
+    const jurusanSelect = document.getElementById('filterJurusan');
+    if (jurusanSelect) jurusanSelect.value = '';
+
+    // Reset sort
+    currentSort = { field: null, direction: null };
+    updateSortUI();
+
+    // Re-apply (shows all rows, original order)
+    // Reload page to get original order since DOM sort is destructive
+    window.location.reload();
 }
