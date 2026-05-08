@@ -1,0 +1,10 @@
+CREATE DATABASE IF NOT EXISTS crud_mahasiswa;
+USE crud_mahasiswa;
+
+CREATE TABLE IF NOT EXISTS mahasiswa (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nim VARCHAR(20) NOT NULL,
+    nama VARCHAR(100) NOT NULL,
+    jurusan VARCHAR(50) NOT NULL,
+    foto VARCHAR(255) NOT NULL
+);
