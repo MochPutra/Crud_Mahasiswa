@@ -83,6 +83,35 @@ function showInlineError(message) {
     }, 3500);
 }
 
+// ========== Jurusan Quick-Select ==========
+function pilihJurusan(btn, jurusan) {
+    const input = document.getElementById('jurusan');
+    if (!input) return;
+
+    // Toggle: if already selected, deselect
+    if (btn.classList.contains('active')) {
+        btn.classList.remove('active');
+        input.value = '';
+        input.focus();
+        return;
+    }
+
+    // Remove active from all chips
+    document.querySelectorAll('.jurusan-chip').forEach(c => c.classList.remove('active'));
+
+    // Set value and highlight chip
+    input.value = jurusan;
+    btn.classList.add('active');
+
+    // Brief visual feedback on input
+    input.style.borderColor = 'rgba(44, 182, 125, 0.5)';
+    input.style.boxShadow = '0 0 0 3px rgba(44, 182, 125, 0.15)';
+    setTimeout(() => {
+        input.style.borderColor = '';
+        input.style.boxShadow = '';
+    }, 600);
+}
+
 // ========== Delete Confirmation Modal ==========
 function openDeleteModal(deleteUrl) {
     const modal = document.getElementById('deleteModal');
@@ -185,6 +214,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // ========== Table Search ==========
     // (initialized on DOMContentLoaded)
+
+    // ========== Auto-highlight jurusan chip on edit ==========
+    const jurusanInput = document.getElementById('jurusan');
+    if (jurusanInput && jurusanInput.value) {
+        document.querySelectorAll('.jurusan-chip').forEach(chip => {
+            // Extract jurusan text (skip emoji)
+            const chipText = chip.textContent.replace(/^[\s\S]?\s/, '').trim();
+            if (chipText === jurusanInput.value.trim()) {
+                chip.classList.add('active');
+            }
+        });
+    }
 });
 
 // ========== Filter & Sort State ==========

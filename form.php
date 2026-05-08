@@ -58,6 +58,12 @@ if (isset($_GET['id'])) {
             <div class="form-group">
                 <label for="jurusan">Jurusan</label>
                 <input type="text" name="jurusan" id="jurusan" value="<?= htmlspecialchars($jurusan); ?>" placeholder="Masukkan jurusan mahasiswa">
+                <div class="jurusan-chips">
+                    <span class="jurusan-chip-label">Pilih cepat:</span>
+                    <button type="button" class="jurusan-chip" onclick="pilihJurusan(this, 'Teknik Informatika')" id="chip-ti">🖥️ Teknik Informatika</button>
+                    <button type="button" class="jurusan-chip" onclick="pilihJurusan(this, 'Teknik Sipil')" id="chip-ts">🏗️ Teknik Sipil</button>
+                    <button type="button" class="jurusan-chip" onclick="pilihJurusan(this, 'Kimia')" id="chip-kimia">🧪 Kimia</button>
+                </div>
             </div>
 
             <div class="form-group">

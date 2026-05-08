@@ -889,6 +889,53 @@ tbody td:last-child {
     color: var(--text-muted);
 }
 
+/* Jurusan Quick-Select Chips */
+.jurusan-chips {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.jurusan-chip-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.jurusan-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 14px;
+    background: var(--bg-card);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    color: var(--text-secondary);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    white-space: nowrap;
+}
+
+.jurusan-chip:hover {
+    background: var(--bg-card-hover);
+    border-color: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+    transform: translateY(-1px);
+}
+
+.jurusan-chip.active {
+    background: rgba(44, 182, 125, 0.15);
+    border-color: rgba(44, 182, 125, 0.35);
+    color: var(--accent-secondary);
+    box-shadow: 0 0 12px rgba(44, 182, 125, 0.15);
+}
+
 /* File Upload Area */
 .file-upload-area {
     border: 2px dashed var(--glass-border);
