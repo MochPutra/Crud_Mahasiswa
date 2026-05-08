@@ -3,10 +3,11 @@
 
 Proyek ini adalah aplikasi web berbasis CRUD sederhana yang dibangun menggunakan HTML, CSS, JavaScript, PHP Native, dan MySQL. 
 
-- **Tema Proyek:** Data Mahasiswa
-- **Pembuat:** Mochamad Putra Nurhadi
+
+- **Nama:** Mochamad Putra Nurhadi
+- **Kelas:** TI 24 A
 - **Jurusan:** Teknik Informatika
-- **Instansi:** Universitas Muhammadiyah Sukabumi
+- **Kampus:** Universitas Muhammadiyah Sukabumi
 
 ## Fitur
 1. Menampilkan data mahasiswa dengan thumbnail foto.
